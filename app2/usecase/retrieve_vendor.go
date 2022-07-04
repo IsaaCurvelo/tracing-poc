@@ -4,7 +4,7 @@ import "app2/domain"
 
 type (
 	VendorRepository interface {
-		findByID(string) (*domain.Vendor, error)
+		FindByID(string) (*domain.Vendor, error)
 	}
 
 	retrieveVendorUseCase struct {
@@ -17,5 +17,5 @@ func NewRetrieveVendorUseCase(vendorRepository VendorRepository) *retrieveVendor
 }
 
 func (r *retrieveVendorUseCase) Execute(ID string) (*domain.Vendor, error) {
-	return r.vendorRepository.findByID(ID)
+	return r.vendorRepository.FindByID(ID)
 }

@@ -19,7 +19,7 @@ func NewVendorsHandler(retriveVendorUseCase RetrieveVendorUseCase) *vendorsHandl
 	return &vendorsHandler{retriveVendorUseCase: retriveVendorUseCase}
 }
 
-func (v vendorsHandler) RetrieveVendorHandler(ctx *gin.Context) {
+func (v vendorsHandler) HandleRetrieveVendor(ctx *gin.Context) {
 	request := &struct {
 		ID string `uri:"vendor-id"`
 	}{}
