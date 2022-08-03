@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "/pb/exclusive_titles_pb";
+
+service ExclusiveTitlesService {
+  rpc GetByVendorID(ExclusiveTitlesRequest) returns (ExclusiveTitlesResponse);
+}
+
+message Empty {}
+
+message ExclusiveTitlesRequest {
+  string vendor_id = 1;
+}
+
+message ExclusiveTitle {
+  string id = 1;
+  string name = 2;
+  string vendor_id = 3;
+}
+
+message ExclusiveTitlesResponse {
+  repeated ExclusiveTitle exclusive_titles = 1;
+}
