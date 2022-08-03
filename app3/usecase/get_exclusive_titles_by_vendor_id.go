@@ -15,8 +15,8 @@ type (
 	}
 )
 
-func NewRetrieveVendorUseCase(vendorRepository ExclusiveTitlesRepository) *getExclusiveTitlesByVendorIDUsecase {
-	return &getExclusiveTitlesByVendorIDUsecase{exclusiveTitlesRepository: vendorRepository}
+func NewGetExclusiveTitlesByVendorIDUsecase(exclusiveTitlesRepository ExclusiveTitlesRepository) *getExclusiveTitlesByVendorIDUsecase {
+	return &getExclusiveTitlesByVendorIDUsecase{exclusiveTitlesRepository: exclusiveTitlesRepository}
 }
 
 func (r *getExclusiveTitlesByVendorIDUsecase) Execute(context context.Context, vendorID string) ([]domain.ExclusiveTitle, error) {
