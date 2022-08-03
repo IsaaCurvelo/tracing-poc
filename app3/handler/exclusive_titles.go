@@ -4,6 +4,8 @@ import (
 	"app3/domain"
 	"app3/pb/exclusive_titles_pb"
 	"context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type (
@@ -29,7 +31,7 @@ func (e exclusiveTitlesHandler) GetByVendorID(context context.Context, exclusive
 	exclusiveTitles, err := e.usecase.Execute(context, exclusiveTitlesRequest.VendorId)
 
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
 	exclusiveTitlesRsp := &exclusive_titles_pb.ExclusiveTitlesResponse{}
