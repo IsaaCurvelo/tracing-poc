@@ -7,7 +7,26 @@ type consolesRepository struct {
 }
 
 func NewConsolesRepository() *consolesRepository {
-	return &consolesRepository{consoles: make(map[string]*domain.Console)}
+	return &consolesRepository{consoles: map[string]*domain.Console{
+		"1": {
+			ID:         "1",
+			VendorID:   "1",
+			Name:       "Playstation 5",
+			Generation: 9,
+		},
+		"2": {
+			ID:         "2",
+			VendorID:   "2",
+			Name:       "Nintendo Switch",
+			Generation: 8,
+		},
+		"3": {
+			ID:         "3",
+			VendorID:   "3",
+			Name:       "Xbox Series X",
+			Generation: 9,
+		},
+	}}
 }
 
 func (cr *consolesRepository) Upsert(console *domain.Console) error {

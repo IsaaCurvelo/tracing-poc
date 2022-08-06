@@ -11,7 +11,23 @@ type vendorsRepository struct {
 }
 
 func NewVendorsRepository() *vendorsRepository {
-	return &vendorsRepository{vendors: make(map[string]*domain.Vendor)}
+	return &vendorsRepository{vendors: map[string]*domain.Vendor{
+		"1": {
+			ID:            "1",
+			Name:          "Sony",
+			OriginCountry: "Japan",
+		},
+		"2": {
+			ID:            "1",
+			Name:          "Nintendo",
+			OriginCountry: "Japan",
+		},
+		"3": {
+			ID:            "1",
+			Name:          "Xbox",
+			OriginCountry: "United States of America",
+		},
+	}}
 }
 
 func (vr *vendorsRepository) FindByID(_ context.Context, ID string) (*domain.Vendor, error) {
