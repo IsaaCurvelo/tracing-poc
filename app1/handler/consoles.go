@@ -2,13 +2,14 @@ package handler
 
 import (
 	"app1/domain"
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type (
 	CreateConsoleUseCase interface {
-		Execute(console *domain.Console) error
+		Execute(context.Context) ([]domain.Console, error)
 	}
 	consolesHandler struct {
 		createConsoleUseCase CreateConsoleUseCase
@@ -19,24 +20,14 @@ func NewConsolesHandler(useCase CreateConsoleUseCase) *consolesHandler {
 	return &consolesHandler{createConsoleUseCase: useCase}
 }
 
-func (ch *consolesHandler) HandleCreateConsole(ctx *gin.Context) {
-	consoleRequest := &domain.Console{}
-
-	err := ctx.ShouldBindJSON(consoleRequest)
+func (ch *consolesHandler) HandleGetAllConsoles(ctx *gin.Context) {
+	allConsoles, err := ch.createConsoleUseCase.Execute(ctx.Request.Context())
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, struct {
+		ctx.JSON(http.StatusInternalServerError, struct {
 			message string
 		}{message: err.Error()})
 		return
 	}
 
-	err = ch.createConsoleUseCase.Execute(consoleRequest)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, struct {
-			message string
-		}{message: err.Error()})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, consoleRequest)
+	ctx.JSON(http.StatusOK, allConsoles)
 }

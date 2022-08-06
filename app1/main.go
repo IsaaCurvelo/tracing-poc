@@ -21,7 +21,7 @@ func main() {
 	engine := gin.New()
 	engine.Use(gin.Recovery())
 
-	engine.POST("/consoles", consolesHandler.HandleCreateConsole)
+	engine.GET("/consoles", consolesHandler.HandleGetAllConsoles)
 
 	httpServer := http.Server{Handler: engine, Addr: ":8081"}
 

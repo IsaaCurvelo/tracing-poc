@@ -2,6 +2,7 @@ package integration
 
 import (
 	"app1/domain"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -15,7 +16,7 @@ func NewVendorsIntegration() *vendorsIntegration {
 	return &vendorsIntegration{}
 }
 
-func (vi *vendorsIntegration) GetByID(ID string) (*domain.Vendor, error) {
+func (vi *vendorsIntegration) GetByID(_ context.Context, ID string) (*domain.Vendor, error) {
 	response, err := http.Get(fmt.Sprintf("localhost:8080/vendors/%v", ID))
 	if err != nil {
 		return nil, err
