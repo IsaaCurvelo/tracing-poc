@@ -10,15 +10,15 @@ type (
 		GetByVendorID(context.Context, string) ([]domain.ExclusiveTitle, error)
 	}
 
-	getExclusiveTitlesByVendorIDUsecase struct {
+	getExclusiveTitlesByVendorID struct {
 		exclusiveTitlesRepository ExclusiveTitlesRepository
 	}
 )
 
-func NewGetExclusiveTitlesByVendorIDUsecase(exclusiveTitlesRepository ExclusiveTitlesRepository) *getExclusiveTitlesByVendorIDUsecase {
-	return &getExclusiveTitlesByVendorIDUsecase{exclusiveTitlesRepository: exclusiveTitlesRepository}
+func NewGetExclusiveTitlesByVendorIDUsecase(exclusiveTitlesRepository ExclusiveTitlesRepository) *getExclusiveTitlesByVendorID {
+	return &getExclusiveTitlesByVendorID{exclusiveTitlesRepository: exclusiveTitlesRepository}
 }
 
-func (r *getExclusiveTitlesByVendorIDUsecase) Execute(context context.Context, vendorID string) ([]domain.ExclusiveTitle, error) {
+func (r *getExclusiveTitlesByVendorID) Execute(context context.Context, vendorID string) ([]domain.ExclusiveTitle, error) {
 	return r.exclusiveTitlesRepository.GetByVendorID(context, vendorID)
 }
