@@ -2,21 +2,22 @@ package handler
 
 import (
 	"app2/domain"
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type (
 	RetrieveVendorUseCase interface {
-		Execute(ID string) (*domain.Vendor, error)
+		Execute(context.Context, string) (*domain.Vendor, error)
 	}
 	vendorsHandler struct {
 		retriveVendorUseCase RetrieveVendorUseCase
 	}
 )
 
-func NewVendorsHandler(retriveVendorUseCase RetrieveVendorUseCase) *vendorsHandler {
-	return &vendorsHandler{retriveVendorUseCase: retriveVendorUseCase}
+func NewVendorsHandler(retrieveVendorUseCase RetrieveVendorUseCase) *vendorsHandler {
+	return &vendorsHandler{retriveVendorUseCase: retrieveVendorUseCase}
 }
 
 func (v vendorsHandler) HandleRetrieveVendor(ctx *gin.Context) {
@@ -29,7 +30,7 @@ func (v vendorsHandler) HandleRetrieveVendor(ctx *gin.Context) {
 		return
 	}
 
-	vendor, err := v.retriveVendorUseCase.Execute(request.ID)
+	vendor, err := v.retriveVendorUseCase.Execute(ctx.Request.Context(), request.ID)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, struct {

@@ -2,9 +2,13 @@ package main
 
 import (
 	"app2/handler"
+	"app2/integration"
+	"app2/pb/exclusive_titles_pb"
 	"app2/repository"
 	"app2/usecase"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"os"
@@ -13,8 +17,18 @@ import (
 
 func main() {
 	// spin up dependencies
+	// grpc client
+	dialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
+	conn, err := grpc.Dial("localhost:4770", dialOption)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+	client := exclusive_titles_pb.NewExclusiveTitlesServiceClient(conn)
+
+	// application components
 	vendorsRepository := repository.NewVendorsRepository()
-	retrieveVendorUseCase := usecase.NewRetrieveVendorUseCase(vendorsRepository)
+	exclusiveTitlesIntegration := integration.NewExclusiveTitlesIntegration(client)
+	retrieveVendorUseCase := usecase.NewRetrieveVendorUseCase(vendorsRepository, exclusiveTitlesIntegration)
 	vendorsHandler := handler.NewVendorsHandler(retrieveVendorUseCase)
 
 	//create gin engine
