@@ -19,7 +19,7 @@ func main() {
 	// spin up dependencies
 	// grpc client
 	dialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
-	conn, err := grpc.Dial("localhost:4770", dialOption)
+	conn, err := grpc.Dial("localhost:8083", dialOption)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
@@ -37,7 +37,7 @@ func main() {
 
 	engine.POST("/vendors/:vendor-id", vendorsHandler.HandleRetrieveVendor)
 
-	httpServer := http.Server{Handler: engine, Addr: ":8080"}
+	httpServer := http.Server{Handler: engine, Addr: ":8082"}
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt)

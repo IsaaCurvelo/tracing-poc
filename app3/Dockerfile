@@ -16,7 +16,7 @@ FROM alpine:3.15
 COPY --from=builder /app/main .
 
 # Expose port
-EXPOSE 8081
+EXPOSE 8083
 
 #Command to run the executable
 CMD ["./main"]

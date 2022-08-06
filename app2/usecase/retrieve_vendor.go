@@ -11,20 +11,20 @@ type (
 	}
 
 	ExclusiveTitlesIntegration interface {
-		GetByVendorID(context context.Context, vendorID string) ([]domain.ExclusiveTitle, error)
+		GetByVendorID(context.Context, string) ([]domain.ExclusiveTitle, error)
 	}
 
-	retrieveVendorUseCase struct {
+	retrieveVendor struct {
 		vendorRepository           VendorRepository
 		exclusiveTitlesIntegration ExclusiveTitlesIntegration
 	}
 )
 
-func NewRetrieveVendorUseCase(vendorRepository VendorRepository, exclusiveTitlesIntegration ExclusiveTitlesIntegration) *retrieveVendorUseCase {
-	return &retrieveVendorUseCase{vendorRepository: vendorRepository, exclusiveTitlesIntegration: exclusiveTitlesIntegration}
+func NewRetrieveVendorUseCase(vendorRepository VendorRepository, exclusiveTitlesIntegration ExclusiveTitlesIntegration) *retrieveVendor {
+	return &retrieveVendor{vendorRepository: vendorRepository, exclusiveTitlesIntegration: exclusiveTitlesIntegration}
 }
 
-func (r *retrieveVendorUseCase) Execute(context context.Context, ID string) (*domain.Vendor, error) {
+func (r *retrieveVendor) Execute(context context.Context, ID string) (*domain.Vendor, error) {
 	vendor, err := r.vendorRepository.FindByID(context, ID)
 	if err != nil {
 		return nil, err

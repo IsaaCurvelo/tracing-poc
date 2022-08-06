@@ -12,12 +12,12 @@ type (
 		Execute(context.Context, string) (*domain.Vendor, error)
 	}
 	vendorsHandler struct {
-		retriveVendorUseCase RetrieveVendorUseCase
+		retrieveVendorUseCase RetrieveVendorUseCase
 	}
 )
 
 func NewVendorsHandler(retrieveVendorUseCase RetrieveVendorUseCase) *vendorsHandler {
-	return &vendorsHandler{retriveVendorUseCase: retrieveVendorUseCase}
+	return &vendorsHandler{retrieveVendorUseCase: retrieveVendorUseCase}
 }
 
 func (v vendorsHandler) HandleRetrieveVendor(ctx *gin.Context) {
@@ -30,7 +30,7 @@ func (v vendorsHandler) HandleRetrieveVendor(ctx *gin.Context) {
 		return
 	}
 
-	vendor, err := v.retriveVendorUseCase.Execute(ctx.Request.Context(), request.ID)
+	vendor, err := v.retrieveVendorUseCase.Execute(ctx.Request.Context(), request.ID)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, struct {

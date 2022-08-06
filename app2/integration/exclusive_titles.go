@@ -30,9 +30,8 @@ func (e exclusiveTitlesIntegration) GetByVendorID(context context.Context, vendo
 	exclusiveTitles := make([]domain.ExclusiveTitle, len(pbResponse.ExclusiveTitles))
 	for i, et := range pbResponse.ExclusiveTitles {
 		exclusiveTitles[i] = domain.ExclusiveTitle{
-			ID:       et.Id,
-			Name:     et.Name,
-			VendorID: et.VendorId,
+			ID:   et.Id,
+			Name: et.Name,
 		}
 	}
 
