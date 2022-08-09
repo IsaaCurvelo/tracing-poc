@@ -35,7 +35,7 @@ func main() {
 	engine := gin.New()
 	engine.Use(gin.Recovery())
 
-	engine.POST("/vendors/:vendor-id", vendorsHandler.HandleRetrieveVendor)
+	engine.GET("/vendors/:vendor-id", vendorsHandler.HandleRetrieveVendor)
 
 	httpServer := http.Server{Handler: engine, Addr: ":8082"}
 
