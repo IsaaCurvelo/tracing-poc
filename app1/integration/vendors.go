@@ -17,7 +17,7 @@ func NewVendorsIntegration() *vendorsIntegration {
 }
 
 func (vi *vendorsIntegration) GetByID(_ context.Context, ID string) (*domain.Vendor, error) {
-	response, err := http.Get(fmt.Sprintf("localhost:8080/vendors/%v", ID))
+	response, err := http.Get(fmt.Sprintf("http://localhost:8082/vendors/%v", ID))
 	if err != nil {
 		return nil, err
 	}

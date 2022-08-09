@@ -33,13 +33,13 @@ func (c *GetAllConsoles) Execute(context context.Context) ([]domain.Console, err
 		return nil, err
 	}
 
-	for _, console := range consoles {
+	for i, console := range consoles {
 		vendor, err := c.VendorsIntegration.GetByID(context, console.VendorID)
 		if err != nil {
 			return nil, err
 		}
 
-		console.Vendor = vendor
+		consoles[i].Vendor = vendor
 	}
 
 	return consoles, nil
