@@ -4,6 +4,7 @@ import (
 	"app2/domain"
 	"app2/pb/exclusive_titles_pb"
 	"context"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 )
 
@@ -21,8 +22,11 @@ func NewExclusiveTitlesIntegration(exclusiveTitlesPB exclusiveTitlesPB) *exclusi
 	return &exclusiveTitlesIntegration{exclusiveTitlesPB: exclusiveTitlesPB}
 }
 
-func (e exclusiveTitlesIntegration) GetByVendorID(context context.Context, vendorID string) ([]domain.ExclusiveTitle, error) {
-	pbResponse, err := e.exclusiveTitlesPB.GetByVendorID(context, &exclusive_titles_pb.ExclusiveTitlesRequest{VendorId: vendorID})
+func (e exclusiveTitlesIntegration) GetByVendorID(ctx context.Context, vendorID string) ([]domain.ExclusiveTitle, error) {
+	ctx, span := otel.Tracer("app2").Start(ctx, "exclusiveTitlesIntegration.GetByVendorID")
+	defer span.End()
+
+	pbResponse, err := e.exclusiveTitlesPB.GetByVendorID(ctx, &exclusive_titles_pb.ExclusiveTitlesRequest{VendorId: vendorID})
 	if err != nil {
 		return nil, err
 	}

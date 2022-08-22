@@ -4,6 +4,7 @@ import (
 	"app2/domain"
 	"context"
 	"fmt"
+	"go.opentelemetry.io/otel"
 )
 
 type vendorsRepository struct {
@@ -30,7 +31,10 @@ func NewVendorsRepository() *vendorsRepository {
 	}}
 }
 
-func (vr *vendorsRepository) FindByID(_ context.Context, ID string) (*domain.Vendor, error) {
+func (vr *vendorsRepository) FindByID(ctx context.Context, ID string) (*domain.Vendor, error) {
+	ctx, span := otel.Tracer("app2").Start(ctx, "vendorsRepository.FindByID")
+	defer span.End()
+
 	if value, ok := vr.vendors[ID]; !ok {
 		return nil, fmt.Errorf("could not find vendor of id %v", ID)
 	} else {

@@ -4,6 +4,7 @@ import (
 	"app2/domain"
 	"context"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel"
 	"net/http"
 )
 
@@ -21,6 +22,9 @@ func NewVendorsHandler(retrieveVendorUseCase RetrieveVendorUseCase) *vendorsHand
 }
 
 func (v vendorsHandler) HandleRetrieveVendor(ctx *gin.Context) {
+	tracingContext, span := otel.Tracer("app2").Start(ctx.Request.Context(), "vendorsHandler.HandleRetrieveVendor")
+	defer span.End()
+
 	request := &struct {
 		ID string `uri:"vendor-id"`
 	}{}
@@ -30,7 +34,7 @@ func (v vendorsHandler) HandleRetrieveVendor(ctx *gin.Context) {
 		return
 	}
 
-	vendor, err := v.retrieveVendorUseCase.Execute(ctx.Request.Context(), request.ID)
+	vendor, err := v.retrieveVendorUseCase.Execute(tracingContext, request.ID)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, struct {
