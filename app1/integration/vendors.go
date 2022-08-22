@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.opentelemetry.io/otel"
 	"io/ioutil"
 	"net/http"
 )
@@ -16,7 +17,10 @@ func NewVendorsIntegration() *vendorsIntegration {
 	return &vendorsIntegration{}
 }
 
-func (vi *vendorsIntegration) GetByID(_ context.Context, ID string) (*domain.Vendor, error) {
+func (vi *vendorsIntegration) GetByID(ctx context.Context, ID string) (*domain.Vendor, error) {
+	ctx, span := otel.Tracer("app1").Start(ctx, "vendorsIntegration.GetByID")
+	defer span.End()
+
 	response, err := http.Get(fmt.Sprintf("http://localhost:8082/vendors/%v", ID))
 	if err != nil {
 		return nil, err

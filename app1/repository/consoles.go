@@ -3,6 +3,7 @@ package repository
 import (
 	"app1/domain"
 	"context"
+	"go.opentelemetry.io/otel"
 )
 
 type consolesRepository struct {
@@ -32,7 +33,10 @@ func NewConsolesRepository() *consolesRepository {
 	}}
 }
 
-func (cr *consolesRepository) GetAll(_ context.Context) ([]domain.Console, error) {
+func (cr *consolesRepository) GetAll(ctx context.Context) ([]domain.Console, error) {
+	ctx, span := otel.Tracer("app1").Start(ctx, "consolesRepository.GetAll")
+	defer span.End()
+
 	allConsoles := make([]domain.Console, len(cr.consoles))
 
 	i := 0

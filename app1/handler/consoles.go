@@ -4,6 +4,7 @@ import (
 	"app1/domain"
 	"context"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel"
 	"net/http"
 )
 
@@ -21,7 +22,13 @@ func NewConsolesHandler(useCase CreateConsoleUseCase) *consolesHandler {
 }
 
 func (ch *consolesHandler) HandleGetAllConsoles(ctx *gin.Context) {
-	allConsoles, err := ch.createConsoleUseCase.Execute(ctx.Request.Context())
+	tracingContext, span := otel.Tracer("app1").Start(
+		ctx.Request.Context(),
+		"consolesHandler.HandleGetAllConsoles",
+	)
+	defer span.End()
+
+	allConsoles, err := ch.createConsoleUseCase.Execute(tracingContext)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, struct {
 			message string
