@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.opentelemetry.io/otel"
-	"io/ioutil"
+	"go.opentelemetry.io/otel/propagation"
+	"io"
+	"log"
 	"net/http"
 )
 
@@ -21,12 +23,23 @@ func (vi *vendorsIntegration) GetByID(ctx context.Context, ID string) (*domain.V
 	ctx, span := otel.Tracer("app1").Start(ctx, "vendorsIntegration.GetByID")
 	defer span.End()
 
-	response, err := http.Get(fmt.Sprintf("http://localhost:8082/vendors/%v", ID))
+	header := http.Header{}
+	propagator := otel.GetTextMapPropagator()
+	propagator.Inject(ctx, propagation.HeaderCarrier(header))
+
+	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:8082/vendors/%v", ID), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	request.Header = header
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		log.Fatal()
+	}
+
+	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}

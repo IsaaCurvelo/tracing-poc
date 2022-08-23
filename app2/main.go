@@ -2,12 +2,15 @@ package main
 
 import (
 	"app2/handler"
+	"app2/handler/middleware"
 	"app2/integration"
 	"app2/pb/exclusive_titles_pb"
 	"app2/repository"
 	"app2/usecase"
 	"context"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -43,6 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(b3.New())
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -57,8 +61,11 @@ func main() {
 
 	// spin up dependencies
 	// grpc client
-	dialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
-	conn, err := grpc.Dial("localhost:8083", dialOption)
+	conn, err := grpc.Dial(
+		"localhost:8083",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+	)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
@@ -73,6 +80,7 @@ func main() {
 	//create gin engine
 	engine := gin.New()
 	engine.Use(gin.Recovery())
+	engine.Use(middleware.Context())
 
 	engine.GET("/vendors/:vendor-id", vendorsHandler.HandleRetrieveVendor)
 

@@ -7,6 +7,7 @@ import (
 	"app1/usecase"
 	"context"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -40,6 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(b3.New())
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

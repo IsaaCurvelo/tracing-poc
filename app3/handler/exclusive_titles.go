@@ -4,6 +4,7 @@ import (
 	"app3/domain"
 	"app3/pb/exclusive_titles_pb"
 	"context"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -25,10 +26,16 @@ func NewExclusiveTitlesHandler(usecase GetExclusiveTitlesByVendorIDUseCase) *exc
 	}
 }
 
-func (e exclusiveTitlesHandler) GetByVendorID(context context.Context, exclusiveTitlesRequest *exclusive_titles_pb.ExclusiveTitlesRequest) (
+func (e exclusiveTitlesHandler) GetByVendorID(ctx context.Context, exclusiveTitlesRequest *exclusive_titles_pb.ExclusiveTitlesRequest) (
 	*exclusive_titles_pb.ExclusiveTitlesResponse, error,
 ) {
-	exclusiveTitles, err := e.usecase.Execute(context, exclusiveTitlesRequest.VendorId)
+	ctx, span := otel.Tracer("app3").Start(
+		ctx,
+		"exclusiveTitlesHandler.GetByVendorID",
+	)
+	defer span.End()
+
+	exclusiveTitles, err := e.usecase.Execute(ctx, exclusiveTitlesRequest.VendorId)
 
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "not found")
