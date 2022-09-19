@@ -41,7 +41,7 @@ func tracerProvider(url string) (*trace.TracerProvider, error) {
 }
 
 func main() {
-	tp, err := tracerProvider("http://localhost:14268/api/traces")
+	tp, err := tracerProvider("http://jaeger:14268/api/traces")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,7 +62,7 @@ func main() {
 	// spin up dependencies
 	// grpc client
 	conn, err := grpc.Dial(
-		"localhost:8083",
+		"app3:8083",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
 	)

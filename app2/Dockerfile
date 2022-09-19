@@ -6,6 +6,8 @@ WORKDIR /app
 # Copy the source from the current directory to the working Directory inside the container
 COPY . .
 
+RUN go mod download
+
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main main.go
 
