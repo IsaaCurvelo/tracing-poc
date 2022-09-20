@@ -27,7 +27,7 @@ func (vi *vendorsIntegration) GetByID(ctx context.Context, ID string) (*domain.V
 	propagator := otel.GetTextMapPropagator()
 	propagator.Inject(ctx, propagation.HeaderCarrier(header))
 
-	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://app2:8082/vendors/%v", ID), nil)
+	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:8082/vendors/%v", ID), nil)
 	if err != nil {
 		return nil, err
 	}
