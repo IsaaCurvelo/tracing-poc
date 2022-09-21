@@ -2,6 +2,7 @@ package main
 
 import (
 	"app1/handler"
+	"app1/handler/middleware"
 	"app1/integration"
 	"app1/repository"
 	"app1/usecase"
@@ -63,6 +64,7 @@ func main() {
 	//create gin engine
 	engine := gin.New()
 	engine.Use(gin.Recovery())
+	engine.Use(middleware.HandleTracingHeaders())
 
 	engine.GET("/consoles", consolesHandler.HandleGetAllConsoles)
 

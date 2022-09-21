@@ -80,7 +80,7 @@ func main() {
 	//create gin engine
 	engine := gin.New()
 	engine.Use(gin.Recovery())
-	engine.Use(middleware.Context())
+	engine.Use(middleware.HandleTracingHeaders())
 
 	engine.GET("/vendors/:vendor-id", vendorsHandler.HandleRetrieveVendor)
 
