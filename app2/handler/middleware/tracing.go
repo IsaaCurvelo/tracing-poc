@@ -4,8 +4,6 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
 	"net/http"
 )
 
@@ -16,12 +14,8 @@ const (
 	RequestID   contextKey = "request-id"
 )
 
-func HandleTracingHeaders() gin.HandlerFunc {
+func BindRequestIDToCtx() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		t := otel.GetTextMapPropagator()
-		tracingContext := t.Extract(ctx.Request.Context(), propagation.HeaderCarrier(ctx.Request.Header))
-		ctx.Request = ctx.Request.WithContext(tracingContext)
-
 		ctx.Request = BindRequestContext(ctx.Request)
 		ctx.Next()
 	}

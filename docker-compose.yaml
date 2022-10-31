@@ -6,13 +6,11 @@ services:
     ports:
       - "16686:16686"
       - "14268:14268"
-    network_mode: host
   app3:
     container_name: app3
     image: observabilitybreakdown/app3
     ports:
       - "8083:8083"
-    network_mode: host
     build: ./app3
     depends_on:
       - jaeger
@@ -21,7 +19,6 @@ services:
     image: observabilitybreakdown/app2
     ports:
       - "8082:8082"
-    network_mode: host
     build: ./app2
     depends_on:
       - app3
@@ -30,7 +27,6 @@ services:
     image: observabilitybreakdown/app1
     ports:
       - "8081:8081"
-    network_mode: host
     build: ./app1
     depends_on:
       - app2

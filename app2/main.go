@@ -10,6 +10,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
@@ -80,11 +81,13 @@ func main() {
 	//create gin engine
 	engine := gin.New()
 	engine.Use(gin.Recovery())
-	engine.Use(middleware.HandleTracingHeaders())
+	engine.Use(middleware.BindRequestIDToCtx())
 
 	engine.GET("/vendors/:vendor-id", vendorsHandler.HandleRetrieveVendor)
 
-	httpServer := http.Server{Handler: engine, Addr: ":8082"}
+	otelHandler := otelhttp.NewHandler(engine, "httpHandler.request_received", otelhttp.WithTracerProvider(tp), otelhttp.WithPropagators(b3.New()))
+
+	httpServer := http.Server{Handler: otelHandler, Addr: ":8082"}
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt)
