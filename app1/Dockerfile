@@ -1,5 +1,5 @@
 # Start from golang base image
-FROM golang:1.17.11-alpine3.16 as builder
+FROM golang:1.19.3-alpine3.16 as builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main main.go
 
 # Start a new stage from scratch
-FROM alpine:3.15
+FROM alpine:3.16
 
 # Copy the Pre-built binary files
 COPY --from=builder /app/main .
