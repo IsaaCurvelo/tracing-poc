@@ -6,6 +6,7 @@ import (
 	"app3/repository"
 	"app3/usecase"
 	"context"
+	"fmt"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
@@ -19,6 +20,11 @@ import (
 	"os"
 	"os/signal"
 	"time"
+)
+
+const (
+	tracingCollectorHostEnv = "TRACING_COLLECTOR_HOST"
+	localhost               = "localhost"
 )
 
 func tracerProvider(url string) (*trace.TracerProvider, error) {
@@ -37,7 +43,14 @@ func tracerProvider(url string) (*trace.TracerProvider, error) {
 }
 
 func main() {
-	tp, err := tracerProvider("http://localhost:14268/api/traces")
+	// retrieve env variables
+	tracingCollectorHost := os.Getenv(tracingCollectorHostEnv)
+	if tracingCollectorHost == "" {
+		tracingCollectorHost = localhost
+	}
+	fmt.Printf("resolved tracing collector host to be %v", tracingCollectorHost)
+
+	tp, err := tracerProvider(fmt.Sprintf("http://%v:14268/api/traces", tracingCollectorHost))
 	if err != nil {
 		log.Fatal(err)
 	}

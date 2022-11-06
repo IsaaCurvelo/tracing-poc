@@ -14,6 +14,8 @@ services:
     build: ./app3
     depends_on:
       - jaeger
+    environment:
+      TRACING_COLLECTOR_HOST: ${TRACING_COLLECTOR_HOST}
   app2:
     container_name: app2
     image: observabilitybreakdown/app2
@@ -22,6 +24,9 @@ services:
     build: ./app2
     depends_on:
       - app3
+    environment:
+      TRACING_COLLECTOR_HOST: ${TRACING_COLLECTOR_HOST}
+      EXCLUSIVE_TITLES_INTEGRATION_HOST: ${EXCLUSIVE_TITLES_INTEGRATION_HOST}
   app1:
     container_name: app1
     image: observabilitybreakdown/app1
@@ -30,3 +35,6 @@ services:
     build: ./app1
     depends_on:
       - app2
+    environment:
+      TRACING_COLLECTOR_HOST: ${TRACING_COLLECTOR_HOST}
+      VENDORS_INTEGRATION_HOST: ${VENDORS_INTEGRATION_HOST}
