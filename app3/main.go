@@ -48,7 +48,7 @@ func main() {
 	if tracingCollectorHost == "" {
 		tracingCollectorHost = localhost
 	}
-	fmt.Printf("resolved tracing collector host to be %v", tracingCollectorHost)
+	fmt.Printf("resolved tracing collector host to be %v\n", tracingCollectorHost)
 
 	tp, err := tracerProvider(fmt.Sprintf("http://%v:14268/api/traces", tracingCollectorHost))
 	if err != nil {
