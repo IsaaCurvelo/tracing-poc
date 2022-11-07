@@ -61,8 +61,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	propagator := b3.New()
+
 	otel.SetTracerProvider(tp)
-	otel.SetTextMapPropagator(b3.New())
+	otel.SetTextMapPropagator(propagator)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -91,7 +94,7 @@ func main() {
 	otelHandler := otelhttp.NewHandler(engine,
 		"httpHandler.request_received",
 		otelhttp.WithTracerProvider(tp),
-		otelhttp.WithPropagators(b3.New()))
+		otelhttp.WithPropagators(propagator))
 
 	httpServer := http.Server{Handler: otelHandler, Addr: ":8081"}
 
