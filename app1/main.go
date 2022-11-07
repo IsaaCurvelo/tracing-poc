@@ -7,6 +7,7 @@ import (
 	"app1/repository"
 	"app1/usecase"
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -20,6 +21,12 @@ import (
 	"os"
 	"os/signal"
 	"time"
+)
+
+const (
+	vendorsIntegrationHostEnv = "VENDORS_INTEGRATION_HOST"
+	tracingCollectorHostEnv   = "TRACING_COLLECTOR_HOST"
+	localhost                 = "localhost"
 )
 
 func tracerProvider(url string) (*trace.TracerProvider, error) {
@@ -38,12 +45,27 @@ func tracerProvider(url string) (*trace.TracerProvider, error) {
 }
 
 func main() {
-	tp, err := tracerProvider("http://localhost:14268/api/traces")
+	// retrieve env variables
+	vendorsIntegrationHost := os.Getenv(vendorsIntegrationHostEnv)
+	if vendorsIntegrationHost == "" {
+		vendorsIntegrationHost = localhost
+	}
+
+	tracingCollectorHost := os.Getenv(tracingCollectorHostEnv)
+	if tracingCollectorHost == "" {
+		tracingCollectorHost = localhost
+	}
+	fmt.Printf("resolved tracing collector host to be %v\n", tracingCollectorHost)
+
+	tp, err := tracerProvider(fmt.Sprintf("http://%v:14268/api/traces", tracingCollectorHost))
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	propagator := b3.New()
+
 	otel.SetTracerProvider(tp)
-	otel.SetTextMapPropagator(b3.New())
+	otel.SetTextMapPropagator(propagator)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -58,7 +80,7 @@ func main() {
 
 	// spin up components
 	consolesRepository := repository.NewConsolesRepository()
-	vendorsIntegration := integration.NewVendorsIntegration()
+	vendorsIntegration := integration.NewVendorsIntegration(vendorsIntegrationHost)
 	createConsoleUseCase := usecase.NewCreateConsoleUseCase(consolesRepository, vendorsIntegration)
 	consolesHandler := handler.NewConsolesHandler(createConsoleUseCase)
 
@@ -69,7 +91,10 @@ func main() {
 
 	engine.GET("/consoles", consolesHandler.HandleGetAllConsoles)
 
-	otelHandler := otelhttp.NewHandler(engine, "httpHandler.request_received", otelhttp.WithTracerProvider(tp), otelhttp.WithPropagators(b3.New()))
+	otelHandler := otelhttp.NewHandler(engine,
+		"httpHandler.request_received",
+		otelhttp.WithTracerProvider(tp),
+		otelhttp.WithPropagators(propagator))
 
 	httpServer := http.Server{Handler: otelHandler, Addr: ":8081"}
 

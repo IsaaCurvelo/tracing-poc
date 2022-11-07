@@ -8,6 +8,7 @@ import (
 	"app2/repository"
 	"app2/usecase"
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -26,6 +27,12 @@ import (
 	"time"
 )
 
+const (
+	exclusiveTitlesIntegrationHostEnv = "EXCLUSIVE_TITLES_INTEGRATION_HOST"
+	tracingCollectorHostEnv           = "TRACING_COLLECTOR_HOST"
+	localhost                         = "localhost"
+)
+
 func tracerProvider(url string) (*trace.TracerProvider, error) {
 	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
 	if err != nil {
@@ -42,7 +49,19 @@ func tracerProvider(url string) (*trace.TracerProvider, error) {
 }
 
 func main() {
-	tp, err := tracerProvider("http://localhost:14268/api/traces")
+	// retrieve env variables
+	exclusiveTitlesIntegrationHost := os.Getenv(exclusiveTitlesIntegrationHostEnv)
+	if exclusiveTitlesIntegrationHost == "" {
+		exclusiveTitlesIntegrationHost = localhost
+	}
+
+	tracingCollectorHost := os.Getenv(tracingCollectorHostEnv)
+	if tracingCollectorHost == "" {
+		tracingCollectorHost = localhost
+	}
+	fmt.Printf("resolved tracing collector host to be %v\n", tracingCollectorHost)
+
+	tp, err := tracerProvider(fmt.Sprintf("http://%v:14268/api/traces", tracingCollectorHost))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +82,7 @@ func main() {
 	// spin up dependencies
 	// grpc client
 	conn, err := grpc.Dial(
-		"localhost:8083",
+		fmt.Sprintf("%v:8083", exclusiveTitlesIntegrationHost),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
 	)
